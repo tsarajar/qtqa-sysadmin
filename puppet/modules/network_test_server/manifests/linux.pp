@@ -11,6 +11,7 @@ class network_test_server::linux {
     include network_test_server::linux::samba
     include network_test_server::linux::tmpreaper
     include network_test_server::linux::sshd
+    include network_test_server::linux::openssl_server_psk
 
     user {
         "qt-test-server":
