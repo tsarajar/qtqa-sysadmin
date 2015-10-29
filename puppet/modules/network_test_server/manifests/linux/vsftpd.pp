@@ -18,13 +18,27 @@ class network_test_server::linux::vsftpd {
             home        =>  "/home/qt-test-server/ftp",
             require     =>  Package["vsftpd"],
         ;
-
-        "ftptest":
-            ensure      =>  present,
-            home        =>  "/home/qt-test-server/ftp",
-            require     =>  [ Package["mkpasswd"], Package["vsftpd"] ],
-            password    =>  mkpasswd('OfmgZrrC', 'password'),
-        ;
+    }
+    
+    if ($::operatingsystem == "Ubuntu") and ($lsbmajdistrelease >= 12) {
+        user {
+            "ftptest":
+                ensure      =>  present,
+                home        =>  "/home/qt-test-server/ftp",
+                require     =>  [ Package["whois"], Package["vsftpd"] ],
+                password    =>  mkpasswd('OfmgZrrC', 'password'),
+            ;
+        }
+    }
+    else {
+        user {
+            "ftptest":
+                ensure      =>  present,
+                home        =>  "/home/qt-test-server/ftp",
+                require     =>  [ Package["mkpasswd"], Package["vsftpd"] ],
+                password    =>  mkpasswd('OfmgZrrC', 'password'),
+            ;
+        }
     }
 
     file {
