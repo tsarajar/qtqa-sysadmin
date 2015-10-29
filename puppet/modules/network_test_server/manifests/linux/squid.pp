@@ -14,21 +14,39 @@ class network_test_server::linux::squid {
         ensure  =>  absent,
     }
 
-    service {
-        "squid3":
-            enable  =>  true,
-            ensure  =>  running,
-            require =>  [ Package["squid3"], File["/etc/default/squid3", "/etc/squid3/squid.conf"] ],
-            pattern =>  '-f /etc/squid3/squid.conf',
-        ;
-        "squid3-authenticating-ntlm":
-            enable  =>  true,
-            ensure  =>  running,
-            require =>  [ Package["squid3"], File["/etc/default/squid3", "/etc/squid3/squid-authenticating-ntlm.conf"] ],
-            pattern =>  '-f /etc/squid3/squid-authenticating-ntlm.conf',
-        ;
+    if ($::operatingsystem == "Ubuntu") and ($lsbmajdistrelease >= 12) {
+        service {
+            "squid3":
+                ensure   =>  running,
+                require  =>  [ Package["squid3"], File["/etc/default/squid3", "/etc/squid3/squid.conf"] ],
+                pattern  =>  '-f /etc/squid3/squid.conf',
+                provider =>  'upstart',
+            ;
+            "squid3-authenticating-ntlm":
+                ensure   =>  running,
+                require  =>  [ Package["squid3"], File["/etc/default/squid3", "/etc/squid3/squid-authenticating-ntlm.conf", "/etc/init/squid3-authenticating-ntlm.conf"] ],
+                pattern  =>  '-f /etc/squid3/squid-authenticating-ntlm.conf',
+                provider =>  'upstart',
+            ;
+        }
     }
-
+    else {
+        service {
+            "squid3":
+                enable  =>  true,
+                ensure  =>  running,
+                require =>  [ Package["squid3"], File["/etc/default/squid3", "/etc/squid3/squid.conf"] ],
+                pattern =>  '-f /etc/squid3/squid.conf',
+            ;
+            "squid3-authenticating-ntlm":
+                enable  =>  true,
+                ensure  =>  running,
+                require =>  [ Package["squid3"], File["/etc/default/squid3", "/etc/squid3/squid-authenticating-ntlm.conf"] ],
+                pattern =>  '-f /etc/squid3/squid-authenticating-ntlm.conf',
+            ;
+        }
+    }
+    
     file {
         "/etc/squid3/squid.conf":
             source  =>  "puppet:///modules/network_test_server/config/squid/squid.conf",
@@ -49,6 +67,14 @@ class network_test_server::linux::squid {
             notify  =>  Service["squid3", "squid3-authenticating-ntlm"],
         ;
     }
-
+    
+    if ($::operatingsystem == "Ubuntu") and ($lsbmajdistrelease >= 12) {
+        file {
+            "/etc/init/squid3-authenticating-ntlm.conf":
+                source  =>  "puppet:///modules/network_test_server/init/squid3-authenticating-ntlm.conf",
+                require =>  Package["squid3"],
+            ;
+        }
+    }
 }
 
