@@ -5,10 +5,10 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/danted
-NAME=$(basename $0)     # may be `danted', `danted-authenticating', etc. Note: In boot it's 'S20danted' etc.
+NAME=$(basename $0)     # may be `danted', `danted-authenticating', etc. Note: In boot it's 'S20danted-authenticating' etc.
 DESC="Dante SOCKS daemon"
-PIDFILE=/var/run/qt_danted.pid
-CONFFILE=/etc/danted.conf
+PIDFILE=/var/run/qt_danted-authenticating.pid
+CONFFILE=/etc/danted-authenticating.conf
 
 test -f $DAEMON   || exit 0
 test -f $CONFFILE || { echo "error: $CONFFILE does not exist" 1>&2; exit 2; }
@@ -60,7 +60,7 @@ case "$1" in
         fi
         ;;
   *)
-	N=/etc/init.d/danted
+	N=/etc/init.d/danted-authenticating
 	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
 	echo "Usage: $N {start|stop|restart|force-reload}" >&2
 	exit 1
