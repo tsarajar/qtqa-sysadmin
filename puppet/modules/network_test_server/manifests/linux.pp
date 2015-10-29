@@ -18,13 +18,28 @@ class network_test_server::linux {
             ensure      =>  present,
             managehome  =>  true,
         ;
-        "qsockstest":
-            ensure      =>  present,
-            home        =>  "/dev/null",
-            password    =>  mkpasswd('AtbhQrjz', 'password'),
-            require     =>  Package["mkpasswd"],
-            shell       =>  "/bin/false",
-        ;
+    }
+    if ($::operatingsystem == "Ubuntu") and ($lsbmajdistrelease >= 12) {    
+        user {
+            "qsockstest":
+                ensure      =>  present,
+                home        =>  "/dev/null",
+                password    =>  mkpasswd('AtbhQrjz', 'password'),
+                require     =>  Package["whois"],
+                shell       =>  "/bin/false",
+            ;
+        }
+    }
+    else {
+        user {
+            "qsockstest":
+                ensure      =>  present,
+                home        =>  "/dev/null",
+                password    =>  mkpasswd('AtbhQrjz', 'password'),
+                require     =>  Package["mkpasswd"],
+                shell       =>  "/bin/false",
+            ;
+        }
     }
 
     host {
@@ -38,9 +53,16 @@ class network_test_server::linux {
         ;
     }
 
-
-    package {
-        "mkpasswd":         ensure  =>  present;
+    if ($::operatingsystem == "Ubuntu") and ($lsbmajdistrelease >= 12) {    
+        package {
+            "whois":           ensure  =>  present;
+            "build-essential": ensure  =>  present;
+        }
+    }
+    else {
+        package {
+            "mkpasswd":         ensure  =>  present;
+        }
     }
 
     file {
